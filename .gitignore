@@ -1,0 +1,10 @@
+*.o
+.flavor
+.objs
+fsesl-basic.so
+assets.h
+cert
+.env
+kore.pid
+producer/producer
+

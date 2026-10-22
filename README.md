@@ -1,0 +1,45 @@
+# Kore Task Example
+
+This Kore app demonstrate the possible bug in the kore task, where the task channel reader is not called for the last channel write when data is written to channel rapidly.
+
+# How to run and test
+
+1. `cd` into producer directory
+2. `make`
+3. `./producer`
+4. build the kore project `kdev build`
+5. run the project `kodev run`
+6. At this point the kore app will connect to `producer` server
+7. Now enter `send` command in `producer` terminal to send event data to kore app.
+8. Analyze the kore terminal that 7 events sent to kore but only few of them are read from the channel.
+
+## How to detect problem
+
+Observe the Kore app output.
+
+The expected behaviour is to see all the event received by the kore when It was sent by the producer but the last event is not received by the channel reader, it is recieved after we send new events again from the producer.
+
+Expected event receive sequence.
+
+1. `APP::CALL_ROUTED`
+2. `CHANNEL_PROGRESS`
+3. `CHANNEL_PROGRESS`
+4. `CHANNEL_ANSWER`
+5. `CHANNEL_ANSWER`
+6. `CHANNEL_HANGUP_COMPLETE`
+7. `CHANNEL_HANGUP_COMPLETE`
+
+The last event is `CHANNEL_HANGUP_COMPLETE` and this event is not read by the channel reader but data is written to channel successfully.
+
+**If every thing works on first attempt then try to send the event again from the `producer` program. Just enter "send" command from running producer program to send the events again**
+
+----
+
+**Sample Payload**
+
+```json
+{"Event-Name":"CHANNEL_PROGRESS","Core-UUID":"cb912140-140d-422d-a965-f3ec5ce826c6","FreeSWITCH-Hostname":"muktar","FreeSWITCH-Switchname":"muktar","FreeSWITCH-IPv4":"192.168.29.233","FreeSWITCH-IPv6":"2405:201:8021:8085:48ed:6ac3:4dd6:2d2d","Event-Date-Local":"2026-10-19 15:30:46","Event-Date-GMT":"Mon, 19 Oct 2026 15:30:46 GMT","Event-Date-Timestamp":"1792423846502219","Event-Calling-File":"switch_channel.c","Event-Calling-Function":"switch_channel_perform_mark_ring_ready_value","Event-Calling-Line-Number":"3506","Event-Sequence":"1009","Channel-State":"CS_CONSUME_MEDIA","Channel-Call-State":"DOWN","Channel-State-Number":"7","Channel-Name":"sofia/external/20000000000","Unique-ID":"f6c4229b-08d5-4702-8308-fe8ec88abdcd","Call-Direction":"outbound","Presence-Call-Direction":"outbound","Channel-HIT-Dialplan":"false","Channel-Call-UUID":"ef6dc262-993c-4886-8861-8ac6d9cb2b47","Answer-State":"ringing","Caller-Direction":"outbound","Caller-Logical-Direction":"outbound","Caller-Username":"1000","Caller-Dialplan":"XML","Caller-Caller-ID-Name":"Extension 1000","Caller-Caller-ID-Number":"1000","Caller-Orig-Caller-ID-Name":"Extension 1000","Caller-Orig-Caller-ID-Number":"1000","Caller-Callee-ID-Name":"20000000000","Caller-Callee-ID-Number":"20000000000","Caller-Network-Addr":"192.168.29.233","Caller-ANI":"1000","Caller-Destination-Number":"20000000000","Caller-Unique-ID":"f6c4229b-08d5-4702-8308-fe8ec88abdcd","Caller-Source":"mod_sofia","Caller-Context":"public","Caller-Channel-Name":"sofia/external/20000000000","Caller-Profile-Index":"1","Caller-Profile-Created-Time":"1792423846342211","Caller-Channel-Created-Time":"1792423846342211","Caller-Channel-Answered-Time":"0","Caller-Channel-Progress-Time":"1792423846502219","Caller-Channel-Progress-Media-Time":"0","Caller-Channel-Hangup-Time":"0","Caller-Channel-Transfer-Time":"0","Caller-Channel-Resurrect-Time":"0","Caller-Channel-Bridged-Time":"0","Caller-Channel-Last-Hold":"0","Caller-Channel-Hold-Accum":"0","Caller-Screen-Bit":"true","Caller-Privacy-Hide-Name":"false","Caller-Privacy-Hide-Number":"false","Other-Type":"originator","Other-Leg-Direction":"inbound","Other-Leg-Logical-Direction":"inbound","Other-Leg-Username":"1000","Other-Leg-Dialplan":"XML","Other-Leg-Caller-ID-Name":"Extension 1000","Other-Leg-Caller-ID-Number":"1000","Other-Leg-Orig-Caller-ID-Name":"Extension 1000","Other-Leg-Orig-Caller-ID-Number":"1000","Other-Leg-Network-Addr":"192.168.29.233","Other-Leg-ANI":"1000","Other-Leg-Destination-Number":"+110000000000","Other-Leg-Unique-ID":"ef6dc262-993c-4886-8861-8ac6d9cb2b47","Other-Leg-Source":"mod_sofia","Other-Leg-Context":"public","Other-Leg-Channel-Name":"sofia/external/FreeSWITCH@127.0.0.1:5080","Other-Leg-Profile-Created-Time":"0","Other-Leg-Channel-Created-Time":"0","Other-Leg-Channel-Answered-Time":"0","Other-Leg-Channel-Progress-Time":"1792423846502219","Other-Leg-Channel-Progress-Media-Time":"0","Other-Leg-Channel-Hangup-Time":"0","Other-Leg-Channel-Transfer-Time":"0","Other-Leg-Channel-Resurrect-Time":"0","Other-Leg-Channel-Bridged-Time":"0","Other-Leg-Channel-Last-Hold":"0","Other-Leg-Channel-Hold-Accum":"0","Other-Leg-Screen-Bit":"true","Other-Leg-Privacy-Hide-Name":"false","Other-Leg-Privacy-Hide-Number":"false","variable_direction":"outbound","variable_is_outbound":"true","variable_uuid":"f6c4229b-08d5-4702-8308-fe8ec88abdcd","variable_session_id":"2","variable_sip_gateway_name":"gw_freeswitch_s2","variable_sip_profile_name":"gateway","variable_text_media_flow":"disabled","variable_channel_name":"sofia/external/20000000000","variable_sip_destination_url":"sip:20000000000@192.168.29.233:5080","variable_max_forwards":"68","variable_originator_codec":"mod_opus.opus@48000h@20i@2c,mod_spandsp.G722@8000h@20i@64000b,CORE_PCM_MODULE.PCMU@8000h@20i@64000b,CORE_PCM_MODULE.PCMA@8000h@20i@64000b","variable_originator":"ef6dc262-993c-4886-8861-8ac6d9cb2b47","variable_signal_bond":"ef6dc262-993c-4886-8861-8ac6d9cb2b47","variable_switch_m_sdp":"v=0\r\no=FreeSWITCH 1792401620 1792401621 IN IP4 192.168.29.233\r\ns=FreeSWITCH\r\nc=IN IP4 192.168.29.233\r\nt=0 0\r\nm=audio 22226 RTP/AVP 102 9 0 8 103 101\r\na=rtpmap:102 opus/48000/2\r\na=fmtp:102 useinbandfec=1; maxaveragebitrate=30000; maxplaybackrate=48000; ptime=20; minptime=10; maxptime=40; stereo=1\r\na=rtpmap:9 G722/8000\r\na=rtpmap:0 PCMU/8000\r\na=rtpmap:8 PCMA/8000\r\na=rtpmap:103 telephone-event/48000\r\na=fmtp:103 0-15\r\na=rtpmap:101 telephone-event/8000\r\na=fmtp:101 0-15\r\na=ptime:20\r\n","variable_call_uuid":"ef6dc262-993c-4886-8861-8ac6d9cb2b47","variable_originate_early_media":"true","variable_originating_leg_uuid":"ef6dc262-993c-4886-8861-8ac6d9cb2b47","variable_originate_endpoint":"sofia","variable_rtp_use_codec_string":"mod_opus.opus@48000h@20i@2c,mod_spandsp.G722@8000h@20i@64000b,CORE_PCM_MODULE.PCMU@8000h@20i@64000b,CORE_PCM_MODULE.PCMA@8000h@20i@64000b","variable_local_media_ip":"127.0.0.1","variable_local_media_port":"17706","variable_advertised_media_ip":"127.0.0.1","variable_audio_media_flow":"sendrecv","variable_video_media_flow":"sendrecv","variable_rtp_local_sdp_str":"v=0\r\no=FreeSWITCH 1792406140 1792406141 IN IP4 127.0.0.1\r\ns=FreeSWITCH\r\nc=IN IP4 127.0.0.1\r\nt=0 0\r\nm=audio 17706 RTP/AVP 102 9 0 8 103 101\r\na=rtpmap:102 opus/48000/2\r\na=fmtp:102 useinbandfec=1; maxaveragebitrate=30000; maxplaybackrate=48000; ptime=20; minptime=10; maxptime=40; stereo=1\r\na=rtpmap:9 G722/8000\r\na=rtpmap:0 PCMU/8000\r\na=rtpmap:8 PCMA/8000\r\na=rtpmap:103 telephone-event/48000\r\na=fmtp:103 0-15\r\na=rtpmap:101 telephone-event/8000\r\na=fmtp:101 0-15\r\na=ptime:20\r\na=sendrecv\r\n","variable_sip_outgoing_contact_uri":"<sip:gw+gw_freeswitch_s2@127.0.0.1:5080;transport=udp;gw=gw_freeswitch_s2>","variable_sip_req_uri":"20000000000@192.168.29.233:5080","variable_sofia_profile_name":"external","variable_recovery_profile_name":"external","variable_sofia_profile_url":"sip:mod_sofia@127.0.0.1:5080","variable_sip_local_network_addr":"127.0.0.1","variable_sip_reply_host":"192.168.29.233","variable_sip_reply_port":"5080","variable_sip_network_ip":"192.168.29.233","variable_sip_network_port":"5080","variable_sip_user_agent":"FreeSWITCH-mod_sofia/1.10.13-dev+git~20250701T194608Z~9d69bd607b~64bit","variable_sip_allow":"INVITE, ACK, BYE, CANCEL, OPTIONS, MESSAGE, INFO, UPDATE, REGISTER, REFER, NOTIFY","variable_sip_recover_contact":"<sip:20000000000@192.168.29.233:5080;transport=udp>","variable_sip_full_via":"SIP/2.0/UDP 127.0.0.1:5080;rport=5080;branch=z9hG4bKQQX55XpeHDtDm","variable_sip_recover_via":"SIP/2.0/UDP 127.0.0.1:5080;rport=5080;branch=z9hG4bKQQX55XpeHDtDm","variable_sip_from_display":"Extension 1000","variable_sip_full_from":"\"Extension 1000\" <sip:FreeSWITCH@192.168.29.233:5080>;tag=rcaQ356rHmHgS","variable_sip_full_to":"<sip:20000000000@192.168.29.233:5080>;tag=etXQ55FU1FeXS","variable_sip_from_user":"FreeSWITCH","variable_sip_from_port":"5080","variable_sip_from_uri":"FreeSWITCH@192.168.29.233:5080","variable_sip_from_host":"192.168.29.233","variable_sip_to_user":"20000000000","variable_sip_to_port":"5080","variable_sip_to_uri":"20000000000@192.168.29.233:5080","variable_sip_to_host":"192.168.29.233","variable_sip_contact_params":"transport=udp","variable_sip_contact_user":"20000000000","variable_sip_contact_port":"5080","variable_sip_contact_uri":"20000000000@192.168.29.233:5080","variable_sip_contact_host":"192.168.29.233","variable_sip_to_tag":"etXQ55FU1FeXS","variable_sip_from_tag":"rcaQ356rHmHgS","variable_sip_cseq":"121658131","variable_sip_call_id":"e59db0be-4674-1240-dfb0-d41b815a2b9f"}
+
+```
+
+In the sample payload you can see the Event name in the first field of the payload.
