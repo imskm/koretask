@@ -93,6 +93,7 @@ handle_success_event(int sockfd)
 		return -1;
 	}
 
+	fprintf(stderr, "\n\n==============[ Event Received ]==============\n\n");
 	kore_task_channel_write(&fsesl_task, buf, nbytes);
 	kore_free(buf);
 
