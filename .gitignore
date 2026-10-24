@@ -1,7 +1,7 @@
 *.o
 .flavor
 .objs
-fsesl-basic.so
+koretask.so
 assets.h
 cert
 .env
