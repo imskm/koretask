@@ -7,7 +7,7 @@ This Kore app demonstrate the possible bug in the kore task, where the task chan
 1. `cd` into producer directory
 2. `make`
 3. `./producer`
-4. build the kore project `kdev build`
+4. build the kore project `kodev build`
 5. run the project `kodev run`
 6. At this point the kore app will connect to `producer` server
 7. Now enter `send` command in `producer` terminal to send event data to kore app.
